@@ -40,6 +40,9 @@ function generateRandomString(length) {
 
 
 module.exports = function (gulp, config) {
+	const buildFolder = config.buildFolder || 'public/build';
+	const env = config.env === 'prod' ? 'prod' : 'test';
+
 	gulp.task('build-config-dir', function () {
 		ensureDirectoryExistence('build_config/js/test.js');
 		ensureDirectoryExistence('build_config/scss/test.scss');
@@ -55,7 +58,7 @@ module.exports = function (gulp, config) {
 
 	gulp.task('assets-domain-config', function(callback) {
 		let assetsDomain = '';
-		if (config.env === 'prod') {
+		if (env === 'prod') {
 			assetsDomain = '//alphaville-h2.ft.com';
 		}
 
@@ -79,7 +82,7 @@ module.exports = function (gulp, config) {
 	});
 
 	gulp.task('clean-build', function (callback) {
-		del(['./public/build'], callback);
+		del([buildFolder], callback);
 	});
 
 	gulp.task('obt-verify', function() {
@@ -95,12 +98,10 @@ module.exports = function (gulp, config) {
 	config.builds.forEach(function (buildConfig) {
 		const baseBuildConfig = {};
 
-		if (config.buildFolder) {
-			baseBuildConfig.buildFolder = config.buildFolder;
-		}
+		baseBuildConfig.buildFolder = buildFolder;
 
-		if (config.env) {
-			baseBuildConfig.env = config.env === 'prod' ? 'production' : 'development';
+		if (env) {
+			baseBuildConfig.env = env === 'prod' ? 'production' : 'development';
 		}
 
 		Object.assign(baseBuildConfig, buildConfig);

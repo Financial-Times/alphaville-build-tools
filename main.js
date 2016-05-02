@@ -1,3 +1,5 @@
+"use strict";
+
 const obt = require('origami-build-tools');
 const del = require('del');
 const runSequence = require('run-sequence');
@@ -82,9 +84,9 @@ module.exports = function (gulp, config) {
 
 	gulp.task('obt-verify', function() {
 		return obt.verify(gulp, {
-			scssLintPath: path.join(__dirname, './node_modules/alphaville-build-tools/config/scss-lint.yml'),
-			esLintPath: path.join(__dirname, './node_modules/alphaville-build-tools/config/.eslintrc'),
-			editorconfigPath: path.join(__dirname, './node_modules/alphaville-build-tools/config/.editorconfig')
+			scssLintPath: path.join(__dirname, 'config/scss-lint.yml'),
+			esLintPath: path.join(__dirname, 'config/.eslintrc'),
+			editorconfigPath: path.join(__dirname, 'config/.editorconfig')
 		});
 	});
 
@@ -111,7 +113,7 @@ module.exports = function (gulp, config) {
 		});
 	});
 
-	gulp.task('obt-build', ['obt-build-main']);
+	gulp.task('obt-build', buildTasks);
 
 	gulp.task('verify', ['obt-verify']);
 	gulp.task('build', function (callback) {

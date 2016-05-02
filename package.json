@@ -1,5 +1,6 @@
 {
   "name": "alphaville-build-tools",
+  "private": true,
   "version": "0.0.0",
   "description": "",
   "main": "main.js",

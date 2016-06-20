@@ -119,7 +119,7 @@ module.exports = function (gulp, config) {
 
 	gulp.task('obt', ['verify', 'build']);
 	gulp.task('default', function (callback) {
-		runSequence('bower-install', 'build', callback);
+		runSequence('bower-clean', 'bower-install', 'build', callback);
 	});
 
 	gulp.task('watch', function() {

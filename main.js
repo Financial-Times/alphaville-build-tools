@@ -70,12 +70,19 @@ module.exports = function (gulp, config) {
 
 
 	gulp.task('bower-install', function (callback) {
-		exec('./node_modules/bower/bin/bower install --force', callback);
+		exec('./node_modules/bower/bin/bower install', callback);
 	});
 
-	gulp.task('bower-clean', function (callback) {
+
+	gulp.task('bower-cache-clean', function (callback) {
 		exec('./node_modules/bower/bin/bower cache clean', callback);
 	});
+
+	gulp.task('bower-folder-clean', function (callback) {
+		del(['./bower_components'], callback);
+	});
+
+	gulp.task('bower-clean', ['bower-cache-clean', 'bower-folder-clean']);
 
 	gulp.task('clean-build', function (callback) {
 		del([buildFolder], callback);

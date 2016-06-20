@@ -69,12 +69,8 @@ module.exports = function (gulp, config) {
 	});
 
 
-	gulp.task('bower-update', function (callback) {
-		exec('./node_modules/bower/bin/bower update', callback);
-	});
-
 	gulp.task('bower-install', function (callback) {
-		exec('./node_modules/bower/bin/bower install', callback);
+		exec('./node_modules/bower/bin/bower install --force', callback);
 	});
 
 	gulp.task('bower-clean', function (callback) {
@@ -123,7 +119,7 @@ module.exports = function (gulp, config) {
 
 	gulp.task('obt', ['verify', 'build']);
 	gulp.task('default', function (callback) {
-		runSequence('bower-update', 'bower-install', 'build', callback);
+		runSequence('bower-install', 'build', callback);
 	});
 
 	gulp.task('watch', function() {

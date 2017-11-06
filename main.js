@@ -57,10 +57,7 @@ module.exports = function (gulp, config) {
 	});
 
 	gulp.task('assets-domain-config', function(callback) {
-		let assetsDomain = '';
-		if (env === 'prod') {
-			assetsDomain = '//alphaville-h2.ft.com';
-		}
+		const assetsDomain = '';
 
 		fs.writeFileSync('build_config/js/assetsDomain.js', `module.exports="${assetsDomain}";`);
 		fs.writeFileSync('build_config/scss/assetsDomain.scss', `$assets-domain: '${assetsDomain}';`);

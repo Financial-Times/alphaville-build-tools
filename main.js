@@ -1,11 +1,11 @@
 "use strict";
 
-const obt = require('origami-build-tools');
 const del = require('del');
 const runSequence = require('run-sequence');
 const exec = require('child_process').exec;
 const fs = require('fs');
 const path = require('path');
+const run = require('gulp-run');
 
 
 function ensureDirectoryExistence (filePath) {
@@ -40,7 +40,7 @@ function generateRandomString(length) {
 
 
 module.exports = function (gulp, config) {
-	const buildFolder = config.buildFolder || 'public/build';
+	const buildFolder = config['build-folder'] || 'public/build';
 	const env = config.env === 'prod' ? 'prod' : 'test';
 
 	gulp.task('build-config-dir', function () {
@@ -85,12 +85,8 @@ module.exports = function (gulp, config) {
 		del([buildFolder], callback);
 	});
 
-	gulp.task('obt-verify', function() {
-		return obt.verify(gulp, {
-			scssLintPath: path.join(__dirname, 'config/scss-lint.yml'),
-			esLintPath: path.join(__dirname, 'config/.eslintrc'),
-			editorconfigPath: path.join(__dirname, 'config/.editorconfig')
-		});
+	gulp.task('obt-verify', function(callback) {
+		run(path.join(__dirname, './node_modules/.bin/obt') + ' verify').exec(callback);
 	});
 
 
@@ -98,7 +94,7 @@ module.exports = function (gulp, config) {
 	config.builds.forEach(function (buildConfig) {
 		const baseBuildConfig = {};
 
-		baseBuildConfig.buildFolder = buildFolder;
+		baseBuildConfig['build-folder'] = buildFolder;
 
 		if (env) {
 			baseBuildConfig.env = env === 'prod' ? 'production' : 'development';
@@ -109,8 +105,14 @@ module.exports = function (gulp, config) {
 		const buildTaskName = 'obt-build-' + (buildConfig.id || generateRandomString(5));
 		buildTasks.push(buildTaskName);
 
-		gulp.task(buildTaskName, function () {
-			return obt.build(gulp, baseBuildConfig);
+		gulp.task(buildTaskName, function (callback) {
+			let command = path.join(__dirname, './node_modules/.bin/obt') + ' build';
+
+			Object.keys(baseBuildConfig).forEach(key => {
+				command += ` --${key} ${baseBuildConfig[key]}`;
+			});
+
+			run(command).exec(callback);
 		});
 	});
 

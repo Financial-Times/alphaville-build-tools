@@ -86,7 +86,7 @@ module.exports = function (gulp, config) {
 	});
 
 	gulp.task('obt-verify', function(callback) {
-		run(path.join(__dirname, './node_modules/.bin/obt') + ' verify').exec(callback);
+		run('./node_modules/.bin/obt verify').exec(callback);
 	});
 
 
@@ -106,7 +106,7 @@ module.exports = function (gulp, config) {
 		buildTasks.push(buildTaskName);
 
 		gulp.task(buildTaskName, function (callback) {
-			let command = path.join(__dirname, './node_modules/.bin/obt') + ' build';
+			let command = './node_modules/.bin/obt build';
 
 			Object.keys(baseBuildConfig).forEach(key => {
 				command += ` --${key} ${baseBuildConfig[key]}`;

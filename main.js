@@ -1,14 +1,12 @@
-"use strict";
+'use strict';
 
 const del = require('del');
 const runSequence = require('run-sequence');
 const exec = require('child_process').exec;
 const fs = require('fs');
 const path = require('path');
-const run = require('gulp-run');
 
-
-function ensureDirectoryExistence (filePath) {
+function ensureDirectoryExistence(filePath) {
 	const dirname = path.dirname(filePath);
 
 	if (directoryExists(dirname)) {
@@ -28,8 +26,9 @@ function directoryExists(path) {
 }
 
 function generateRandomString(length) {
-	let text = "";
-	const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	let text = '';
+	const possible =
+		'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 	for (let i = 0; i < length; i++) {
 		text += possible.charAt(Math.floor(Math.random() * possible.length));
@@ -38,12 +37,11 @@ function generateRandomString(length) {
 	return text;
 }
 
-
-module.exports = function (gulp, config) {
+module.exports = function(gulp, config) {
 	const buildFolder = config['build-folder'] || 'public/build';
 	const env = config.env === 'prod' ? 'prod' : 'test';
 
-	gulp.task('build-config-dir', function () {
+	gulp.task('build-config-dir', function() {
 		ensureDirectoryExistence('build_config/js/test.js');
 		ensureDirectoryExistence('build_config/scss/test.scss');
 	});
@@ -51,47 +49,56 @@ module.exports = function (gulp, config) {
 	gulp.task('fingerprint', function(callback) {
 		const fingerprint = generateRandomString(10);
 
-		fs.writeFileSync('build_config/js/fingerprint.js', `module.exports="${fingerprint}";`);
-		fs.writeFileSync('build_config/scss/fingerprint.scss', `$fingerprint: '${fingerprint}';`);
+		fs.writeFileSync(
+			'build_config/js/fingerprint.js',
+			`module.exports="${fingerprint}";`
+		);
+		fs.writeFileSync(
+			'build_config/scss/fingerprint.scss',
+			`$fingerprint: '${fingerprint}';`
+		);
 		callback();
 	});
 
 	gulp.task('assets-domain-config', function(callback) {
 		const assetsDomain = '';
 
-		fs.writeFileSync('build_config/js/assetsDomain.js', `module.exports="${assetsDomain}";`);
-		fs.writeFileSync('build_config/scss/assetsDomain.scss', `$assets-domain: '${assetsDomain}';`);
+		fs.writeFileSync(
+			'build_config/js/assetsDomain.js',
+			`module.exports="${assetsDomain}";`
+		);
+		fs.writeFileSync(
+			'build_config/scss/assetsDomain.scss',
+			`$assets-domain: '${assetsDomain}';`
+		);
 
 		callback();
 	});
 
-
-	gulp.task('bower-install', function (callback) {
+	gulp.task('bower-install', function(callback) {
 		exec('./node_modules/bower/bin/bower install', callback);
 	});
 
-
-	gulp.task('bower-cache-clean', function (callback) {
+	gulp.task('bower-cache-clean', function(callback) {
 		exec('./node_modules/bower/bin/bower cache clean', callback);
 	});
 
-	gulp.task('bower-folder-clean', function (callback) {
+	gulp.task('bower-folder-clean', function(callback) {
 		del(['./bower_components'], callback);
 	});
 
 	gulp.task('bower-clean', ['bower-cache-clean', 'bower-folder-clean']);
 
-	gulp.task('clean-build', function (callback) {
+	gulp.task('clean-build', function(callback) {
 		del([buildFolder], callback);
 	});
 
 	gulp.task('obt-verify', function(callback) {
-		run('./node_modules/.bin/obt verify').exec(callback);
+		exec('./node_modules/.bin/obt verify', callback);
 	});
 
-
 	const buildTasks = [];
-	config.builds.forEach(function (buildConfig) {
+	config.builds.forEach(function(buildConfig) {
 		const baseBuildConfig = {};
 
 		baseBuildConfig['build-folder'] = buildFolder;
@@ -102,29 +109,37 @@ module.exports = function (gulp, config) {
 
 		Object.assign(baseBuildConfig, buildConfig);
 
-		const buildTaskName = 'obt-build-' + (buildConfig.id || generateRandomString(5));
+		const buildTaskName =
+			'obt-build-' + (buildConfig.id || generateRandomString(5));
 		buildTasks.push(buildTaskName);
 
-		gulp.task(buildTaskName, function (callback) {
+		gulp.task(buildTaskName, function(callback) {
 			let command = './node_modules/.bin/obt build';
 
 			Object.keys(baseBuildConfig).forEach(key => {
 				command += ` --${key} ${baseBuildConfig[key]}`;
 			});
 
-			run(command).exec(callback);
+			exec(command, callback);
 		});
 	});
 
 	gulp.task('obt-build', buildTasks);
 
 	gulp.task('verify', ['obt-verify']);
-	gulp.task('build', function (callback) {
-		runSequence('clean-build', 'build-config-dir', 'fingerprint', 'assets-domain-config', 'obt-build', callback);
+	gulp.task('build', function(callback) {
+		runSequence(
+			'clean-build',
+			'build-config-dir',
+			'fingerprint',
+			'assets-domain-config',
+			'obt-build',
+			callback
+		);
 	});
 
 	gulp.task('obt', ['verify', 'build']);
-	gulp.task('default', function (callback) {
+	gulp.task('default', function(callback) {
 		runSequence('bower-clean', 'bower-install', 'build', callback);
 	});
 

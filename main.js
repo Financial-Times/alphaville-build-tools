@@ -3,6 +3,7 @@
 const del = require('del');
 const runSequence = require('run-sequence');
 const exec = require('child_process').exec;
+const spawn = require('child_process').spawn;
 const fs = require('fs');
 const path = require('path');
 
@@ -114,13 +115,18 @@ module.exports = function(gulp, config) {
 		buildTasks.push(buildTaskName);
 
 		gulp.task(buildTaskName, function(callback) {
-			let command = './node_modules/.bin/obt build';
+			let command = './node_modules/.bin/obt';
+			let args = ['build'];
 
 			Object.keys(baseBuildConfig).forEach(key => {
-				command += ` --${key} ${baseBuildConfig[key]}`;
+				args.push(` --${key} ${baseBuildConfig[key]}`);
 			});
 
-			exec(command, callback);
+			const runCmd = spawn(command, args);
+			runCmd.on('error', err => console.log(err));
+			runCmd.on('close', () => {
+				callback();
+			})
 		});
 	});
 

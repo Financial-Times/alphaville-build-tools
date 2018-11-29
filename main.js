@@ -3,7 +3,7 @@
 const del = require('del');
 const runSequence = require('run-sequence');
 const exec = require('child_process').exec;
-const spawn = require('child_process').spawn;
+const fork = require('child_process').fork;
 const fs = require('fs');
 const path = require('path');
 
@@ -122,7 +122,7 @@ module.exports = function(gulp, config) {
 				args.push(` --${key} ${baseBuildConfig[key]}`);
 			});
 
-			const runCmd = spawn(command, args);
+			const runCmd = fork(command, args);
 			runCmd.on('error', err => console.log(err));
 			runCmd.on('close', () => {
 				callback();

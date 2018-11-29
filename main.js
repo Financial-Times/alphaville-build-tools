@@ -119,7 +119,7 @@ module.exports = function(gulp, config) {
 			let args = ['build'];
 
 			Object.keys(baseBuildConfig).forEach(key => {
-				args.push(` --${key} ${baseBuildConfig[key]}`);
+				args.push(`--${key}`, baseBuildConfig[key]);
 			});
 
 			const runCmd = fork(command, args);

@@ -1,7 +1,6 @@
 'use strict';
 
 const del = require('del');
-const runSequence = require('run-sequence');
 const exec = require('child_process').exec;
 const fork = require('child_process').fork;
 const fs = require('fs');
@@ -42,9 +41,10 @@ module.exports = function(gulp, config) {
 	const buildFolder = config['build-folder'] || 'public/build';
 	const env = config.env === 'prod' ? 'prod' : 'test';
 
-	gulp.task('build-config-dir', function() {
+	gulp.task('build-config-dir', function(done) {
 		ensureDirectoryExistence('build_config/js/test.js');
 		ensureDirectoryExistence('build_config/scss/test.scss');
+		done();
 	});
 
 	gulp.task('fingerprint', function(callback) {
@@ -88,7 +88,7 @@ module.exports = function(gulp, config) {
 		del(['./bower_components'], callback);
 	});
 
-	gulp.task('bower-clean', ['bower-cache-clean', 'bower-folder-clean']);
+	gulp.task('bower-clean', gulp.series('bower-cache-clean', 'bower-folder-clean'));
 
 	gulp.task('clean-build', function(callback) {
 		del([buildFolder], callback);
@@ -130,24 +130,15 @@ module.exports = function(gulp, config) {
 		});
 	});
 
-	gulp.task('obt-build', buildTasks);
+	gulp.task('obt-build', gulp.series(...buildTasks));
 
-	gulp.task('verify', ['obt-verify']);
-	gulp.task('build', function(callback) {
-		runSequence(
-			'clean-build',
-			'build-config-dir',
-			'fingerprint',
-			'assets-domain-config',
-			'obt-build',
-			callback
-		);
-	});
+	gulp.task('verify', gulp.series('obt-verify'));
+	gulp.task('build', gulp.series('clean-build', 'build-config-dir', 'fingerprint', 'assets-domain-config', 'obt-build'));
 
-	gulp.task('obt', ['verify', 'build']);
-	gulp.task('default', function(callback) {
-		runSequence('bower-clean', 'bower-install', 'build', callback);
-	});
+
+	gulp.task('obt', gulp.series('verify', 'build'));
+
+	gulp.task('default', gulp.series('bower-clean', 'bower-install', 'build'));
 
 	gulp.task('watch', function() {
 		gulp.watch(['./assets/**'], ['obt-build']);

@@ -1,4 +1,5 @@
 # alphaville-build-tools
+## NO LONGER IN USE - functionality has been merged into `alphaville-longroom` as that is now the only app that uses it
 Creates gulp tasks for Alphaville 2 specific services.
 
 ## How to use it
